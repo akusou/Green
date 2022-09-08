@@ -1,0 +1,38 @@
+name: Green
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+	- name: Clone repository
+        uses: actions/checkout@v3
+
+	- name: Green
+        run: |
+          git config --local user.email "akusou@proton.me"
+          git config --local user.name "akusou"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git pull --rebase
+          git commit --allow-empty -m "Green"
+          git push
+	
+    - name: Green
+        if: github.event.action != 'GREEN'
+        run: |
+          curl -X POST https://api.github.com/repos/akusou/akusou/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          --data '{"event_type": "AKUSOU", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+
+    - name: Green
+        if: github.event.action == 'GREEN'
+        run: |
+          echo "RESPONSE received from '${{ github.event.client_payload.repository }}'"
+          curl -X POST https://api.github.com/repos/akusou/akusou/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          --data '{"event_type": "AKUSOU", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
